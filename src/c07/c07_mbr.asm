@@ -5,7 +5,7 @@
          
          jmp near start
 	
- message db '1+2+3+...+100='
+ message db '1+2+3+...+100='    ;98->nasm支持这样的做法,在编译阶段,编译器将把它们拆开,以形成一个个单独的字节
         
  start:
          mov ax,0x7c0           ;设置数据段的段基地址 
@@ -33,11 +33,13 @@
      @f:
          add ax,cx
          inc cx
-         cmp cx,100
-         jle @f
+         cmp cx,100             ;91->cmp指令在功能上和sub指令相同,唯一不同之处在于,cmp指令仅仅根据计算的结果设置相应的标志位,而不保留计算结果
+                                ;91->cmp指令将会影响到CF、OF、SF、ZF、AF和PF标志位
+         jle @f                 ;91->less or equal
 
          ;以下计算累加和的每个数位 
          xor cx,cx              ;设置堆栈段的段基地址
+         ;100->定义栈需要两个连续的步骤:即初始化段寄存器ss和栈指针sp的内容
          mov ss,cx
          mov sp,cx
 
@@ -48,7 +50,7 @@
          xor dx,dx
          div bx
          or dl,0x30
-         push dx
+         push dx                ;102->push指令只接受16位的操作数
          cmp ax,0
          jne @d
 
